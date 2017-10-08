@@ -42,5 +42,13 @@ together with some algebraic laws that they should have.
 
 where **flatmap** is an operation on each of these types but **unit** is different for each monad, that is, each monad has a different expression that gives the unit value.
 
+## Monad's algebraic laws
 
+To be a monad, besides of the shape, it should satisfy the following propierties:
 
+1. Associativity:
+`m flatmap f flatmap g == m flatmap(x=> f(x) flatmap g)`
+2. Left unit: 
+`unit(x) flatmap f == f(x)`
+3. Right unit:
+`m flatmap unit == m`
