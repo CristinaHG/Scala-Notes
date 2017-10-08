@@ -33,15 +33,6 @@ trait Monad[T]{
 
 together with some algebraic laws that they should have.
 
-## Examples
-
-- **List** is a monad with `unit(x)=List(x)`
-- **Set** is a monad with `unit(x)=Set(x)`
-- **Option** is a monad with `unit(x)=Some(x)`
-- **Generator** is a monad with `unit(x)=single(x)`
-
-where **flatmap** is an operation on each of these types but **unit** is different for each monad, that is, each monad has a different expression that gives the unit value.
-
 ## Monad's algebraic laws
 
 To be a monad, besides of the shape, it should satisfy the following propierties:
@@ -52,3 +43,14 @@ To be a monad, besides of the shape, it should satisfy the following propierties
 `unit(x) flatmap f == f(x)`
 3. Right unit:
 `m flatmap unit == m`
+
+## Examples
+
+- **List** is a monad with `unit(x)=List(x)`
+- **Set** is a monad with `unit(x)=Set(x)`
+- **Option** is a monad with `unit(x)=Some(x)`
+- **Generator** is a monad with `unit(x)=single(x)`
+
+where **flatmap** is an operation on each of these types but **unit** is different for each monad, that is, each monad has a different expression that gives the unit value.
+
+
