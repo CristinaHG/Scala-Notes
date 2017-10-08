@@ -38,11 +38,19 @@ together with some algebraic laws that they should have.
 To be a monad, besides of the shape, it should satisfy the following propierties:
 
 1. Associativity:
-`m flatmap f flatmap g == m flatmap(x=> f(x) flatmap g)`
+`(m flatmap f) flatmap g == m flatmap(x=> f(x) flatmap g)`
 2. Left unit: 
 `unit(x) flatmap f == f(x)`
 3. Right unit:
 `m flatmap unit == m`
+
+**Monoids**: a simple form of monads that doesn't bind anything (easier domain). For example, *Integers* are a monoid. Lets check they have all the needed propierties:
+1. Associativity:
+`(x+y)+z=x+(y+z)`
+2. Left unit:
+`x flatmap f = f(x)`
+3. Right unit:
+`x flatmap unit=x`
 
 ## Examples
 
