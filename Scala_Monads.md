@@ -61,4 +61,25 @@ To be a monad, besides of the shape, it should satisfy the following propierties
 
 where **flatmap** is an operation on each of these types but **unit** is different for each monad, that is, each monad has a different expression that gives the unit value.
 
+Another example:
 
+```scala
+abstract class Option[+T]{
+
+	def flatMap[U](f: T => Option[U]): Option[U] = this match {
+	  case Some(x) => f(x) // gives optional value
+	  case None => None
+	}
+}
+```
+is a monad as it verifies:
+1. Associativity: `(opt flatmap f) flatmap g == opt flatmap (x=> f(x) flatmap g)`
+
+```scala
+	(opt fatmap f) flatmap g
+	== (opt match { case Some(x) => f(x) case None => None })
+	match {case Some(y) => g(y) case None => None } //second flatmap
+```
+
+2. Left unit: `Some(x) flatmap f` as Some(x) matches case Some(x) and that is `f(x)`
+3. Right unit: `opt flatmap Some` opt could match Some or None. If Some is matched, Some(x) would be return else none would be return. In each of the two cases we turn exactly the thing we started with, that is ,opt.
