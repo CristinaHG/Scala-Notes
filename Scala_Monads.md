@@ -111,5 +111,11 @@ is the same as:
 ```
 that is, that we can "inline" nested for expressions, providing a bigger one.
 
-2.
+2. Right unit: the trivial for expression that generates x and return it, is the same as the original value.
+
+```scala
+	for (x <-m) yield x == m `
+```
+3. Left unit does no have analogue for for-expressions. only associativity and Right unit is important for for-expressions behaviour.
+
 
