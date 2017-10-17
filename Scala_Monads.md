@@ -32,6 +32,7 @@ trait Monad[T]{
 ```
 
 together with some algebraic laws that they should have.
+If appart from **flatmap** they also define **withFilter** they are called **"monads with zero".**
 
 ## Monad's algebraic laws
 
@@ -92,6 +93,60 @@ is a monad as it verifies:
 
 2. Left unit: `Some(x) flatmap f` as Some(x) matches case Some(x) and that is `f(x)`
 3. Right unit: `opt flatmap Some` opt could match Some or None. If Some is matched, Some(x) would be return else none would be return. In each of the two cases we turn exactly the thing we started with, that is ,opt.
+
+Another example, **Try** :
+
+```scala
+	abstract class Try[+T]
+	case class Success[T](x: T) extends Try[T]
+	case class Failure(ex: Exception) extends Try[Nothing]
+```
+
+you can wrap up some comptation in a Try: `Try(expr) //gives Success(someValue) or Failure(someException)`. So an implementation for **Try** could be:
+
+```scala
+	object Try{
+	  def apply[T](expr: => T): Try[T] = //expression passed by name (arrow indicates call by name parameter)
+	    try Success(expr)
+	    catch {
+		case NonFatal(ex) => Failure(ex) //runtime exceptions, normal exceptions
+	    }	
+	}
+``` 
+composing it as a for expression:
+
+```scala
+	for {
+	  x <-computeX
+	  y <-computeY
+	}yield f(x,y)
+```
+if computeX and computeY both succeed, that will return a success value with the value of f(x,y), but it computation fails with an exception, will return Failure(ex) with the first exception that went wrong.
+To support the notation above, we must define **flatmap** and **map** on the **Try** type:
+
+```scala
+	abstract class Try[+T]{
+		def flatMap[U](f:T => Try[U]): Try[U] = this match {
+        	  case Success(x) => Try f(x) catch { case nonFatal(ex) => Failure(ex) }
+	          case fail: Failure => fail
+		}
+
+		def map[U](f:T => U): Try[U] = this match {
+		  case Success(x) => Try(f(x))
+		  case fail: Failure => fail
+		}}
+```
+
+So for a Try value, t :
+
+```scala
+	t map f == t flatMap (x => Try(f(x)))
+		== t flatMap (f andThen Try)
+```
+
+but is **Try** a monad with `unit=Try` ? **Not really** because the left unit law fails as `Try(expr) flatMap f != f(expr)` as the left part will never raise a non-fatal exception whereas the right part will raise any exception thrown by **expr** of **f**. 
+
+*Bullet-proof principle: "An expression composed from Try, map ,flatMap will never throw a non-fatal exception"*
 
 ## Meaning of the laws for For-Expressions
 monad typed expressions are typically written as for expressions, so what laws are saying in that case is:
