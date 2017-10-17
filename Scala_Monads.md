@@ -76,10 +76,40 @@ is a monad as it verifies:
 1. Associativity: `(opt flatmap f) flatmap g == opt flatmap (x=> f(x) flatmap g)`
 
 ```scala
-	(opt fatmap f) flatmap g
+	(opt flatmap f) flatmap g
 	== (opt match { case Some(x) => f(x) case None => None })
 	match {case Some(y) => g(y) case None => None } //second flatmap
 ```
 
+```scala
+	opt match{
+		case Some(x) =>
+		  f(x) match {case Some(y) => g(y) case None => None }
+		case None =>
+		  None match { case Some(y) => g(y) case None => None }
+}
+```
+
 2. Left unit: `Some(x) flatmap f` as Some(x) matches case Some(x) and that is `f(x)`
 3. Right unit: `opt flatmap Some` opt could match Some or None. If Some is matched, Some(x) would be return else none would be return. In each of the two cases we turn exactly the thing we started with, that is ,opt.
+
+## Meaning of the laws for For-Expressions
+monad typed expressions are typically written as for expressions, so what laws are saying in that case is:
+1. Associativity: says that
+
+```scala
+	for(y <- for (x<-m; y <- f(x)) yield y
+	z <- g(y)) yield z 
+``` 
+
+is the same as: 
+
+```scala
+	for (x <-m;
+	     y <-f(x)
+             z <-g(y)) yield z
+```
+that is, that we can "inline" nested for expressions, providing a bigger one.
+
+2.
+
