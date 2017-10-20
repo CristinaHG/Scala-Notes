@@ -46,3 +46,39 @@ Every form of **mutable state** is constructed from variables. They're written a
 So if we want an inmutable stte object, we will declare it as `val x: String = "Cristina"` but if what we want is a mutable state object, we will declare it as `var x: String = "Cristina"`.
 Both, value and variable definition associates a value with its name, but the difference is that with variable definitions tha association can be changed later, for example, if we now do: `x="Alex"` , `x` will change its value to 'Alex' just if x is declared as a var. If declared as val, x will still keep the value "Cristina" after the "Alex" assigment. 
 
+
+## State in objects
+
+objects with state are usually repesented by **objects that have some variable members**. For example, the *bank account* defines a variable *balance* that contains the current balance of the account, and the methods *deposit* and *withdraw* change that variable value.  
+
+```scala
+	class BankAccount {
+	  private var balance=0
+	  def deposit(amount: Int): Unit ={
+	    if(amount > 0) balance=balance+amount
+	  }
+	  
+          def withdraw(amount: Int): Int =
+	    if(amount > 0 && amount <=balance) {
+	      balance=balance - amount
+	      balance
+	    } else throw new Error ("insufficient funds")
+	}
+```
+
+Another example, *bankaccount proxy* :
+
+```scala
+	class BankAccountProxy(ba: BankAccount){
+	   def deposit(amount: Int): Unit = ba.deposit(amount)
+	   def withdraw(amount: Int): Int = ba.withdraw(amount)
+	}
+```
+
+although *BankAccountProxy* does not contain any mutable variable, it is a **stateful object too** as it depends on the history, and so when *deposit* or *withdraw* are called, the balace of the bank account is really changed as originals methods in *bankaccount* would do.
+
+
+
+
+
+
