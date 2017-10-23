@@ -200,3 +200,32 @@ The *or gate* function:
 	}	
 ```
 
+The *simutation trait* implementation:
+
+simulation trait must keep in every instance an agenda of actions to perform. An agenda will be a list of simulated events, each of them will be an action with the time it must be produced. The actions to be performed first should be at the beginning, just to pick the 1º element each time.
+
+```scala
+	trait Simulation{
+		type Action = () => Unit //takes some empty parameter that leads to unit
+		case class Event(time: Int, action: Action) //some class of events
+		private type Agenda=List[Event]
+		private var agenda: Agenda=List()
+	}
+```
+
+Handling time: we have `private var curtime=0` containing the current simulation time, and we define `def currentTime:Int=curtime` from the beginning, so it is a getter function for `curtime`. 
+
+AfterDelay method:
+
+*AfterDelay(delay)(block)* insert the task *Event(curtime+delay, ()=>block //do the action involved to perform the block)* into the agenda at the right position.   
+
+```scala
+	def AfterDelay(delay: Int)(block: => Unit): Unit={
+		val item= Event(currentTime+delay, () => block) //creates event at a given time with the given options to perform
+		agenda= insert(agenda,item)
+	}
+```
+
+
+
+ 
