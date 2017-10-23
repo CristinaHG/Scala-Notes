@@ -77,8 +77,126 @@ where for both, the output is:
 	2c
 ```
 
+### Extended example
+
+lets construct a digital circuit simulator with gates *inverter* , *and* and *or* using classes and functions. As the electronic components have a delay time, they do not change the input inmediately. 
+Lets say we've got a class *wire* that models wires. Then we can define the gates as functions like:
+
+```scala
+	def inverter(input: wire, output:wire): Unit
+	def anGate(a1:wire, a2:wire, output:wire): Unit
+	def orGate(a1:wire, a2:wire, output:wire): Unit
+``` 
+
+and so we can define a half-adder as:
+
+```scala
+	def halfadder(a:wire, b:wire, s:wire, c:wire): Unit={
+		val d = new wire
+		val e = new wire
+		orGate(a,b,d)
+		anGate(a,b,c)
+		inverter(c,e)
+		anGate(d,e,s)
+	}
+```
+
+a half adder output is 1 just if both inputs are different values. Whith that halfadder, a fulladder can be defined as:
+
+```scala
+	def fulldadder(a:wire, b:wire, cin:wire, sum:wire, cout:wire): Unit={
+		val s = new wire
+		val c1 = new wire
+		val c2 = new wire
+		halfadder(b,cin,s,c1)
+		halfadder(a,s,sum,c2)
+		orGate(c1,c2,cout)
+	}
+```
 
 
+#### API and usage
 
+Now we give an implementation of this class and its functions which allow us to simulate circuits, based on an API. A digital circuit simulator performs actions. An *action* is a function that doesn't take any parameters and which returns unit: `type Action =() => Unit`
 
+A simulation happens inside an objects that inherits from *simulation trait*: 
+
+```scala
+	trait Simulation{
+		def currentTime: Int=??? //returns current simlated time as integer
+		def afterDelay(delay:Int)(block: => Unit): Unit= ??? //register block of statements to be performed as action after delay 
+		def run():Unit=??? //performs the simulation until there are no more actions	
+	}
+```
+
+##### Interface of gates
+
+The *wire* class must support 3 operations: 
+
+- getSignal: Boolean -> return the current value of signal that is transported by wire.
+- setSignal(sig: Boolean): Unit -> modifies the value of the signal transported by wire.
+- addAction(a: Action): Unit -> attaches the specified action to the actions of the wire. All of the attached actions are executed at each change of the transported signal. 
+
+```scala
+	class wire{
+		private var sigVal: false //value of current signal in the wire
+		private var actions: List[Action] = List() // actions to be performed when signal change
+		def getSignal: Boolean=signal
+		def setSignal(s:Boolean): Unit = { // if signal is different from the old one, signal is updated and actions excuted
+			if( s != sigVal){
+				sigVal=s
+				actions foreach (_()) // for(a<-actions) a()
+			}
+		}
+		def addAction(a: Action): Unit)={
+			actions= a::actions
+			a() 
+		}
+
+	}
+```
+
+The *inverter* function:
+
+inverter can be implemented by installing an action on its input, so that the action will be performed each time the input change. This action produces the inverse of the input signal on the output wire, after a delay of *InverterDelay* units of time.
+
+```scala
+	def inverter(input: wire, output: wire): Unit={
+		def invertAction(): Unit ={
+			val inputSig=input.getSignal
+			afterDelay(InverterDelay){output.setSignal !inputSig}
+		}
+		input addAction invertAction	
+	}	
+```
+
+The *and gate* function:
+
+```scala
+	def anGate(in1: wire, in2: wire, output: wire): Unit={
+		def andAction(): Unit={
+			val in1Sig=in1.getSignal //get value of input1
+			val in2Sig=in2.getSignal //get value of input2
+			afterDelay(AndGateDelay){output.setSignal (in1Sig & in2Sig)}		
+		}
+
+		in1 addAction anAction	// whenever one of the wire signal changes the output signal will be recomputed
+		in2 addAction anAction	// whenever one of the wire signal changes the output signal will be recomputed	
+	}	
+```
+
+The *or gate* function:
+
+```scala
+	def orGate(in1: wire, in2: wire, output: wire): Unit={
+		def orAction(): Unit={
+			val in1Sig=in1.getSignal //get value of input1
+			val in2Sig=in2.getSignal //get value of input2
+			afterDelay(OrGateDelay){output.setSignal (in1Sig | in2Sig)}		
+		}
+
+		in1 addAction orAction	// whenever one of the wire signal changes the output signal will be recomputed
+		in2 addAction orAction	// whenever one of the wire signal changes the output signal will be recomputed	
+	}	
+```
 
