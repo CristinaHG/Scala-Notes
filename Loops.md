@@ -53,7 +53,14 @@ Scala forloop is similar to Java extended for loop:
 	for (i<- 1 until 3; j<- "abc"){println(i+ " "+j)}
 ```
 
-For-loops translate similar to for-expressions but using *foreach* combinator instead of *map* or *flatmap* :
+For-loops translate similar to for-expressions but using *foreach* combinator instead of *map* or *flatmap*. **Foreach** is defined on all collections with elements of type T, as follows:
+
+```scala
+	def foreach(f: T => Unit): Unit=
+	   //apply f to each element
+```
+
+So the for-loop is translated as:
 
 ```scala
 	(1 until 3) foreach (i => "abc" foreach (j=>println(i+ " "+j)))
