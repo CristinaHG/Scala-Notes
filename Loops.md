@@ -34,4 +34,44 @@ Implementation:
 	}
 ```
 
+## For loop
+
+A Java for-loop looks like:
+
+```java
+	for (int i=1; i<3; i=i+1){
+		system.out.print(i+" ");
+	}
+	
+```
+
+but this can't be modeled simply by high-order function. **For** arguments contain the declaration of "i",  which is visible in other args and in the body of the loop. 
+
+Scala forloop is similar to Java extended for loop:
+
+```scala
+	for (i<- 1 until 3; j<- "abc"){println(i+ " "+j)}
+```
+
+For-loops translate similar to for-expressions but using *foreach* combinator instead of *map* or *flatmap* :
+
+```scala
+	(1 until 3) foreach (i => "abc" foreach (j=>println(i+ " "+j)))
+```
+
+where for both, the output is: 
+
+```scala
+	1a
+	1b
+	1c
+	2a
+	2b
+	2c
+```
+
+
+
+
+
 
