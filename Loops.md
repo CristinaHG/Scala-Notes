@@ -217,12 +217,36 @@ Handling time: we have `private var curtime=0` containing the current simulation
 
 AfterDelay method:
 
-*AfterDelay(delay)(block)* insert the task *Event(curtime+delay, ()=>block //do the action involved to perform the block)* into the agenda at the right position.   
+*AfterDelay(delay)(block)* insert the task *Event(curtime+delay, ()=>block //do the action involved to perform the block)* into the agenda at the right position. 
 
 ```scala
 	def AfterDelay(delay: Int)(block: => Unit): Unit={
 		val item= Event(currentTime+delay, () => block) //creates event at a given time with the given options to perform
 		agenda= insert(agenda,item)
+	}
+```
+
+where `() => block` means do the action involved to perform the operation in the block, and *insert* is implemented as:
+
+```scala
+	private def insert(ag:List[Event], item:Event): List[Event] = ag match {
+		case first::rest if (first.time <= item.time) =>
+			first::insert(rest,item) 
+		case _ =>
+			item::ag
+	}
+```
+
+The *event handling loop* removes sucesive elements from the agenda and perform the associated actions: 
+
+```scala
+	private def loop(): Unit=agenda match{
+		case first::rest=>
+			agenda=rest
+			curtime=first.time
+			first.action()
+			loop()
+		case Nil=>
 	}
 ```
 
