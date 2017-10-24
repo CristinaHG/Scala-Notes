@@ -250,6 +250,42 @@ The *event handling loop* removes sucesive elements from the agenda and perform 
 	}
 ```
 
+*The run method* executes the event loop after installing an initial message to show the start of simuation:
+
+```scala
+	def run(): Unit={
+		afterDelay(0){
+			println("simulation started",time=''+currentTime+''***'')		
+		}
+		loop()
+	}
+```
+
+*Probe* is defined as a way to examine changes of signals on the wire:
+
+```scala
+	def probe(name: String, w:wire): Unit={
+		def probeAction(): Unit={
+			println(s"$name $currentTime value=${w.getSignal}") // wire name + time+ the new signal in the wire
+		}	
+		w addAction probeAction //add action to the wire to be executed each time the wire changes
+	}
+```
+
+We can pack all delay constants into their own *trait* so that we could do: `object sim extends Circuits with Parameters` ,so *Parameters* could be defined as:
+
+```scala
+	trait Parameters{
+		def InverterDelay=2
+		def AndGateDelay=5
+		def orGateDelay=6
+	}
+```
+
+So, **state & assignments** makes our model more complicated, as we lose referencial transparency and computation model, but we gain the possibility of formulating complex programs in an elegant,concise and understandable way by using **High order functios with states and assigments**. 
+
+
+
 
 
  
